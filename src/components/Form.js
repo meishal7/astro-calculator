@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Button from "@mui/material/Button";
 
@@ -36,7 +36,16 @@ const FormStyle = styled.div`
     text-align: center;
   }
   .calc-btn {
+    border-radius: 5px;
+    border: 1px solid white;
+    background-color: #e6e3e8;
+    width: 200px;
+    height: 50px;
+    color: black;
     margin-top: 3em;
+  }
+  .calc-btn:hover {
+    background-color: #a061df;
   }
   .form-buttons {
     display: flex;
@@ -45,15 +54,14 @@ const FormStyle = styled.div`
   }
 `;
 
-const Form = (props) => {
+const Form = ({ onSubmitWeight }) => {
   const [weight, setWeight] = useState(" ");
   const [error, setError] = useState();
+  const [planet, setPlanet] = useState("Jupiter");
 
   const weightHandler = (event) => {
     setWeight(event.target.value);
   };
-
-  const planetHandler = (event) => {};
 
   const submitHandler = (event) => {
     event.preventDefault();
@@ -65,36 +73,63 @@ const Form = (props) => {
       });
       return;
     }
+    let newWeight = 0;
+    switch (planet) {
+      case "Jupiter":
+        newWeight = Math.floor((weight / 9.81) * 24.79);
+        break;
+      case "Mars":
+        newWeight = Math.floor((weight / 9.81) * 3.711);
+        break;
+      case "Mercury":
+        newWeight = Math.floor((weight / 9.81) * 3.7);
+        break;
+      case "Venus":
+        newWeight = Math.floor((weight / 9.81) * 8.87);
+        break;
+      case "Neptune":
+        newWeight = Math.floor((weight / 9.81) * 11.15);
+        break;
+      case "Uranus":
+        newWeight = Math.floor((weight / 9.81) * 8.69);
+        break;
+      case "Saturn":
+        newWeight = Math.floor((weight / 9.81) * 10.44);
+        break;
+      default:
+        console.log("There is an error in weight calculating.");
+    }
+
+    let data = {
+      prevWeight: weight,
+      newWeight: newWeight,
+      planet: planet,
+    };
+
+    onSubmitWeight(data);
+    setWeight(" ");
   };
-
-  // const expenseData = {
-  //   title: title,
-  //   date: date,
-
-  //   year: +format(new Date(date), "yyyy"),
-  //   month: format(new Date(date), "MMM"),
-  //   // day: format(new Date(date), "dd"),
-  //   cost: cost,
-  //   category: category,
-  // };
-
-  //     props.onSubmitNewWeight(expenseData, authCtx.token);
-  //     setTitle("");
-  //     setDate("");
-  //     setCost("");
-  //     setCategory("Choose Category");
-  //   };
 
   const errorHandler = () => {
     setError(null);
   };
+
+  let planets = [
+    "Jupiter",
+    "Mars",
+    "Mercury",
+    "Venus",
+    "Neptune",
+    "Uranus",
+    "Saturn",
+  ];
 
   return (
     <FormStyle>
       <form onSubmit={submitHandler}>
         <div className="fields">
           <div className="input-set">
-            <label htmlFor="weight-input">Weight on Earth: </label>
+            <label htmlFor="weight-input">Weight on Earth (lb): </label>
             <input
               className="weight-input"
               type="text"
@@ -107,20 +142,25 @@ const Form = (props) => {
           </div>
           <div className="input-set">
             <label>Choose a planet:</label>
-            <select className="planets-filter" onChange={planetHandler}>
-              <option value="Jupiter">Jupiter</option>
-              <option value="Mars">Mars</option>
-              <option value="Mercury">Mercury</option>
-              <option value="Neptune">Neptune</option>
-              <option value="Uranus">Uranus</option>
-              <option value="Saturn">Saturn</option>
-              <option value="Venus">Venus</option>
+            <select
+              className="planets-filter"
+              onChange={(event) => {
+                setPlanet(event.target.value);
+              }}
+            >
+              {planets.map((planet) => (
+                <option key={planet} value={planet}>
+                  {planet}
+                </option>
+              ))}
             </select>
           </div>
         </div>
 
         <div className="form-buttons">
-          <Button className="calc-btn">Calculate</Button>
+          <button type="submit" className="calc-btn">
+            Calculate
+          </button>
         </div>
       </form>
     </FormStyle>
